@@ -4,7 +4,7 @@ import axios from 'axios';
 export const fetchMenWear = createAsyncThunk(
   'men/fetchMenWear',
   async () => {
-    const response = await axios.get('http://localhost:3000/api/men_clothing');
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/men_clothing`);
     return response.data; 
   }
 );
