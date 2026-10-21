@@ -6,13 +6,29 @@ import kidsClothing from './routes/kids_clothing.js';
 import footwear from './routes/footwear.js';
 import beauty from './routes/beauty.js';
 import cors from 'cors';
-import { footwearModel } from './models/footwearModel.js';
-import { footwearData } from '../footwear.js';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.frontend_uri
+];
 
-app.use(cors());
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.use(express.json());
 app.use('/api/men_clothing' , menClothing)
 app.use('/api/women_clothing' , womenClothing)
@@ -21,7 +37,7 @@ app.use('/api/footwear' , footwear)
 app.use('/api/beauty' , beauty)
 
 
-mongoose.connect('mongodb://localhost/E-commerce')
+mongoose.connect(process.env.MONGODB_URI)
 .then(()=> console.log('Connected to MongoDB') )
 .catch((err)=> console.log("couldn't connect to mongodb", err));
 
@@ -30,16 +46,8 @@ app.get("/"  ,(req,res) =>{
     res.send("API For Products");
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.listen(port , ()=>{
     console.log(`Server is running on port http://localhost:${port}`);
 })
-
-// const upload_items = (data)=>{
-//     footwearModel.insertMany(data)
-//     .then(() => console.log("Items uploaded successfully"))
-//     .catch((err) => console.log("Error uploading items", err));
-// }
-
-// upload_items(footwearData)
